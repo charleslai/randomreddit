@@ -75,7 +75,7 @@ class MainHandler(Handler):
             #Comment Body
             comment_body = random_comment.body
             #Comment Score
-            if random_comment.score < 0:
+            if random_comment.score <= 0:
                 comment_score = "Comment Score:  " + "<span style=\"color:red\">" + `random_comment.score` + "</span>"
             elif random_comment.score > 0:
                 comment_score = "Comment Score:  " + "<span style=\"color:green\">" + `random_comment.score` + "</span>"
