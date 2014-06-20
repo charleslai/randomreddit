@@ -16,17 +16,15 @@
 #
 
 #== Dependencies ========================================================#
-import sys
 import os
 import jinja2
 import webapp2
 import random
-from google.appengine.api import memcache
 from google.appengine.ext import ndb
 import praw #!important
 
 #PRAW Dependencies
-r = praw.Reddit(user_agent="Random Reddit Comments v1.0 by /u/sirprinceking")
+r = praw.Reddit(user_agent="Random Reddit Comments by /u/sirprinceking")
 
 #Jinja2 Template Directory
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -60,37 +58,49 @@ class MainHandler(Handler):
                     submission_link=submission_link, comment_link=comment_link, comment_score=comment_score)
 
     def get(self):
-        #Render landing page on load
-        self.render_rrc("Get a random comment from Reddit!")
+        """
+        Handle GET requests
+        """
+        #Render landing page on load. Displays an introductory message
+        self.render_rrc("Get a random comment from Reddit!", "This app was made to deconstruct the conversations \
+                                                              happening on Reddit by taking comments out of context \
+                                                              and displaying them here! Sometimes it's lame \
+                                                              and other times you come across gold. Click the button \
+                                                              below to get started!")
 
     def post(self):
+        """
+        Handle POST requests
+        """
+        #Sometimes an unknown exception breaks the page. use try-except to solve.
+        #Get the sr entitiy from the data store and chose a random subreddit.
         try:
-            #Get the sr entitiy from the data store and chose a random subreddit.
             sr = ndb.Key(urlsafe='ag5zfnJhbmRvbXJlZGRpdHIUCxIHU1JDYWNoZRiAgICAgICACgw').get()
             random_sr = random.choice(sr.srlist)
             #Pick a random comment from the random subreddit
             all_comments = list(r.get_comments(random_sr))
             random_comment = random.choice(all_comments)
 
-            #Comment Body
+            #-- Comment Body --
             comment_body = random_comment.body
-            #Comment Score
+
+            #-- Comment Score --
             if random_comment.score <= 0:
                 comment_score = "Comment Score:  " + "<span style=\"color:red\">" + `random_comment.score` + "</span>"
             elif random_comment.score > 0:
                 comment_score = "Comment Score:  " + "<span style=\"color:green\">" + `random_comment.score` + "</span>"
-            #Submission Title
+            #--  Submission Title --
             if len(random_comment.submission.title) > 75:
                 submission_title = "Submission Title:  " + random_comment.submission.title[0:75] + "..." + "</br>"
             elif len(random_comment.submission.title) <= 75:
                 submission_title = "Submission Title:  " + random_comment.submission.title + "</br>"
-            #Submission Link
+            #-- Submission Link --
             submission_link = "Submission Link:  " + "<a href=\"" + random_comment.submission.short_link + "\">" + \
                                random_comment.submission.short_link + "</a></br>"
-            #Comment Link
+            #-- Comment Link --
             comment_link = "Comment Link:  " + "<a href=\"" + random_comment.permalink + "\">" + \
                             random_comment.permalink[0:50] + "..." + "</a></br>"
-            #Author
+            #-- Author --
             author = "By: " + random_comment.author.name
 
             #Render the page template with API response values
@@ -99,10 +109,10 @@ class MainHandler(Handler):
         except Exception:
             self.render_rrc("Oops! Something broke on our side. Try again!")
 
-
 class CacheHandler(Handler):
     """
-    Subreddit cache updater
+    Subreddit cache updater. Navigate to /refresh_SRCache to update the list
+    of random subreddits after prefething with the bash script.
     """
     def get(self):
         #Create a new list of subreddits from the sr.txt file
@@ -112,9 +122,10 @@ class CacheHandler(Handler):
         sr.srlist = srlist
         sr.put()
 
+
 class SRCache(ndb.Model):
     """
-    Datastore model to hold a cache of various subreddits.
+    Datastore model to hold a cache of various subreddits. Updated using CacheHandler methods.
     """
     srlist = ndb.StringProperty(repeated=True)
 

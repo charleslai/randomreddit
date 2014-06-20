@@ -20,14 +20,14 @@
             <div class="grid-1"></div>
             <div class="grid-4 centered">
         		<form method="post">
-                    <div class="comment_box">
+                    <div class="comment_box justified" style="width: 95%; margin-left:auto; margin-right:auto">
                         <span class="sub-heading">{{comment}}</span>
                     </div>
-                    <div class="user right">
+                    <div class="user right" style="width: 95%; margin-left:auto; margin-right:auto">
                         <span class="sub-sub-heading">{{author}}</span>
                     </div>
                     <br>
-                    <div class="info_box left">
+                    <div class="info_box left" style="width: 95%; margin-left:auto; margin-right:auto">
                         {{submission_title}}
                         {{submission_link}}
                         {{comment_link}}
@@ -40,6 +40,9 @@
         		</form>
             </div>
             <div class="grid-1"></div>
+            <!--<grid class="grid-full">
+                <footer>text</footer>
+            </div>-->
         </div>
     </body>
 </html>
