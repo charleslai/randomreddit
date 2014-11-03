@@ -22,6 +22,15 @@ import webapp2
 import random
 from google.appengine.ext import ndb
 import praw #!important
+import markdown
+#import twython
+
+#Twython Dependencies
+#APP_KEY = 'TyMKIxHSjoKZUfQq02DYMg'
+#APP_SECRET = 'eLT5INynMmuCGQTWlk0iZzay0Qhdgwb5WDX1bY4bGs'
+#OAUTH_TOKEN = '712381478-Cg86nYeDEFK43aCKsFiZpogU365lDoBWTnEaCQ4g'
+#OAUTH_TOKEN_SECRET = 'NCwyPzqQPiPChQ59Bx5YM48qyaaIaoYnZXr0bQFw6FIW3'
+#twitter = twython.Twython(APP_KEY, APP_SECRET,OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 #PRAW Dependencies
 r = praw.Reddit(user_agent="Random Reddit Comments by /u/sirprinceking")
@@ -67,7 +76,6 @@ class MainHandler(Handler):
                                                               and displaying them here! Sometimes it's lame \
                                                               and other times you come across gold. Click the button \
                                                               below to get started!")
-
     def post(self):
         """
         Handle POST requests
@@ -82,30 +90,37 @@ class MainHandler(Handler):
             random_comment = random.choice(all_comments)
 
             #-- Comment Body --
-            comment_body = random_comment.body
+            comment_body = markdown.markdown(random_comment.body)
 
             #-- Comment Score --
             if random_comment.score <= 0:
                 comment_score = "Comment Score:  " + "<span style=\"color:red\">" + `random_comment.score` + "</span>"
             elif random_comment.score > 0:
                 comment_score = "Comment Score:  " + "<span style=\"color:green\">" + `random_comment.score` + "</span>"
-            #--  Submission Title --
+
+            #-- Submission Title --
             if len(random_comment.submission.title) > 75:
                 submission_title = "Submission Title:  " + random_comment.submission.title[0:75] + "..." + "</br>"
             elif len(random_comment.submission.title) <= 75:
                 submission_title = "Submission Title:  " + random_comment.submission.title + "</br>"
+
             #-- Submission Link --
             submission_link = "Submission Link:  " + "<a href=\"" + random_comment.submission.short_link + "\">" + \
                                random_comment.submission.short_link + "</a></br>"
+
             #-- Comment Link --
             comment_link = "Comment Link:  " + "<a href=\"" + random_comment.permalink + "\">" + \
                             random_comment.permalink[0:50] + "..." + "</a></br>"
+                            
             #-- Author --
             author = "By: " + random_comment.author.name
+
+            #twitter.update_status(status='Twython API Wrapper Test: SUCCESS!')
 
             #Render the page template with API response values
             self.render_rrc("Get another comment!", comment_body, author, submission_title, submission_link,
                             comment_link, comment_score)
+
         except Exception:
             self.render_rrc("Oops! Something broke on our side. Try again!")
 

@@ -37,6 +37,7 @@ canvas {
 }
 
 body {
+  position: relative;
   font-family: 'Open Sans', sans-serif !important;
 }
 
@@ -137,9 +138,8 @@ body {
 }
 
 footer {
-  font-size: 0.9em;
-  border-top: 1px solid #ccc;
-  padding: 0.5em 0 2.5em;
+  position: absolute;
+  bottom: 0px;
 }
 
 .header-bar{
